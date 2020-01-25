@@ -66,19 +66,19 @@ let clearPreVertex (input: PreVertex list): PreVertex list =
         | [] -> acc
     tmp input []
 
-let mapEdge (node: Node) (e: PreEdge) (input: PreVertex List): Edge list =
-    let rec tmp (node: Node) (e: PreEdge) (input: PreVertex List) acc =
+let mapEdge ((_,rest) as node: Node) (e: PreEdge) (input: PreVertex List): Edge list =
+    let rec tmp ((_,rest) as node: Node) (e: PreEdge) (input: PreVertex List) acc =
         match input with
         | H::R -> 
             match H with
-                | ((f,_) as n,_) when TupleEquality n node |> not && f = e ->   // TupleEquality n node |> not    <=>  !TupleEquality n node  <=> n != node
+                | ((f,s) as n,_) when  rest+ (string e) = (string f)+(s.[0 .. s.Length-1]) ->   // TupleEquality n node |> not    <=>  !TupleEquality n node  <=> n != node
                     let acc' = (e,n) :: acc
                     tmp node e R acc'
                 | (_,_) ->
                     tmp node e R acc
         | [H] ->
             match H with
-                | ((f,_) as n,_) when TupleEquality n node |> not && f = e -> 
+                | ((f,s) as n,_) when  rest+ (string e) = (string f)+(s.[0 .. s.Length-1]) -> 
                     let acc' = (e,n) :: acc
                     tmp node e [] acc'
                 | (_,_) ->
