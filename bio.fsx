@@ -160,10 +160,20 @@ let getEulerianPath (graph:Graph) =
         result
     | _ -> []
 
-let rec nodesToSequence acc (nodes:Node list) = 
-    match nodes with
-    | [] -> acc
-    | h::t -> nodesToSequence (acc+string h.[h.Length-1]) t
+
+let nodesToSequence (path:Node list) = 
+    let rec _nodesToSequence acc (nodes:Node list) = 
+        match nodes with
+        | [] -> acc
+        | h::t -> _nodesToSequence (acc+string h.[h.Length-1]) t
+    _nodesToSequence path.[0].[..path.[0].Length-2] path
+
+let isCycle (path:Node list) = 
+    path.[0] = path.[path.Length-1]
+
+let rotateCycle cycle index = 
+    let (a,b) = List.splitAt index cycle
+    b @ a @ [b.[0]]
 
 let input = ["AAA"; "AAC"; "ACA"; "CAC"; "CAA";"ACG"; "CGC"; "GCA"; "ACT";"CTT";"TTA";"TAA"]
 //len of strings
@@ -177,6 +187,10 @@ let k = 3
 let graph = wordsToGraph input |> List.map (fun (a,n) -> (a,n |> List.rev))
 let path = getEulerianPath graph
 
-// TODO: generate all possible eulerian paths from given path
+let allPaths = 
+    if isCycle path then
+        List.map (fun i -> rotateCycle path i |> nodesToSequence) [1..path.Length-1]
+    else
+        [nodesToSequence path]
 
-let sequence = nodesToSequence path.[0].[..k-3] path
+// TODO: generate all possible eulerian paths from given path
